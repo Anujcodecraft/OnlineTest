@@ -135,7 +135,8 @@ export default function Login() {
       });
 
       const decoded = JSON.parse(atob(res.data.token.split('.')[1]));
-      login(res.data.token, decoded.role);
+     console.log("uigr",res.data.user._id)
+      login(res.data.token, decoded.role,res.data.user);
 
       if (decoded.role === "admin") navigate("/admin/create");
       else navigate("/join");

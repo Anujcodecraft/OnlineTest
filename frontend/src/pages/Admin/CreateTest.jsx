@@ -342,6 +342,7 @@ const Message = styled(motion.div)`
 
 export default function CreateTest() {
   const { user } = useAuth();
+  console.log("heyy",user)
   const [form, setForm] = useState({
     title: "",
     description: "",

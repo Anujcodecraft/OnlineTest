@@ -231,6 +231,19 @@ const Navbar = () => {
                 </motion.div>
               )}
               
+              {user.role === "student" && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <NavLink to="/usertests">
+                    <FileText size={18} />
+                    Past Test
+                  </NavLink>
+                </motion.div>
+              )}
+              
               {user.role === "admin" && (
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
@@ -240,6 +253,18 @@ const Navbar = () => {
                   <NavLink to="/admin/create">
                     <PlusCircle size={18} />
                     Create Test
+                  </NavLink>
+                </motion.div>
+              )}
+              {user.role === "admin" && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <NavLink to="/admin/PastTest">
+                    <PlusCircle size={18} />
+                    Past Test
                   </NavLink>
                 </motion.div>
               )}
