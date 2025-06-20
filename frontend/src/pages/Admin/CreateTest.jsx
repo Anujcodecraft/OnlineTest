@@ -180,7 +180,7 @@ export default function CreateTest() {
 
       payload.append("questions", JSON.stringify(processedQuestions));
 
-      await axios.post("http://localhost:5000/api/test/create", payload, {
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/test/create`, payload, {
         headers: {
           Authorization: `Bearer ${user.token}`,
           "Content-Type": "multipart/form-data"

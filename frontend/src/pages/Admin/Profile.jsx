@@ -34,7 +34,7 @@ const Profile = () => {
     const fetchReport = async () => {
       try {
         const { data: payload } = await axios.get(
-          `http://localhost:5000/api/test/ass/${assessmentId}`,
+          `${import.meta.env.VITE_API_URL}api/test/ass/${assessmentId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token')}`,

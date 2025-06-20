@@ -25,7 +25,7 @@ const UserTests = () => {
     const fetchData = async () => {
       try {
         const { data } = await axios.get(
-          `http://localhost:5000/api/test/user/${user.id}`,
+          `${import.meta.env.VITE_API_URL}/api/test/user/${user.id}`,
           { headers: { Authorization: `Bearer ${token}` } },
         );
         const assessments = (data.data || []).sort(
