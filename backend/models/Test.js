@@ -1,10 +1,22 @@
-// models/Test.js
 import mongoose from 'mongoose';
 
+const testCaseSchema = new mongoose.Schema({
+  inputFileUrl: { type: String },
+  outputFileUrl: { type: String}
+});
+
 const questionSchema = new mongoose.Schema({
-  question: { type: String, required: true },
+  type: { type: String, enum: ['MCQ', 'coding'], required: true },
+  question: { type: String },
+
+  // MCQ-specific
   options: [String],
-  correctAnswer: { type: Number, required: true } // index of correct option
+  correctAnswer: Number, // index of correct option
+
+  // Coding-specific
+  initialCode: String,
+  // languageId: Number, // Judge0 language ID
+  testCases: [testCaseSchema]
 });
 
 const testSchema = new mongoose.Schema({

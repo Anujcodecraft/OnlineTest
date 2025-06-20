@@ -9,6 +9,7 @@ const router = express.Router();
 // Start assessment (creates assessment doc with start time)
 router.post('/start', authenticateJWT, async (req, res) => {
   try {
+    console.log("er are in assessment")
     const { testCode } = req.body;
     const test = await Test.findOne({ testCode });
     if (!test) return res.status(404).json({ message: 'Test not found.' });

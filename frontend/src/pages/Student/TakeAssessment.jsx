@@ -1,27 +1,31 @@
+// File: src/pages/TakeAssessment.jsx
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { motion } from "framer-motion";
+import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/theme-monokai";
+import "ace-builds/src-noconflict/mode-c_cpp";
+import "ace-builds/src-noconflict/mode-python";
+import "ace-builds/src-noconflict/mode-javascript";
 import styled from "styled-components";
 import { CheckCircle, AlertCircle, Clock, Send } from "lucide-react";
 
-// Styled Components
 const Container = styled.div`
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   padding: 2rem;
+  background: #f9fafb;
+  min-height: 100vh;
 `;
 
-const AssessmentContainer = styled(motion.div)`
+const AssessmentContainer = styled.div`
   max-width: 900px;
-  margin: 0 auto;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
+  margin: auto;
+  background: white;
+  border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 `;
 
 const Header = styled.div`
@@ -29,157 +33,117 @@ const Header = styled.div`
   margin-bottom: 2rem;
 `;
 
-const Title = styled.h2`
-  font-size: 2rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 0.5rem;
+const Title = styled.h1`
+  font-size: 2.5rem;
+  color: #4f46e5;
+  font-weight: 700;
+`;
+
+const ErrorMessage = styled.div`
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 8px;
+`;
+
+const LoadingMessage = styled.div`
+  text-align: center;
+  color: #6b7280;
+  font-size: 1.125rem;
 `;
 
 const TestInfo = styled.div`
   display: flex;
   justify-content: space-between;
-  background: rgba(102, 126, 234, 0.1);
-  padding: 1rem;
-  border-radius: 12px;
-  margin-bottom: 2rem;
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
 `;
 
 const InfoItem = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 500;
+  color: #374151;
 `;
 
-const QuestionCard = styled(motion.div)`
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border: 2px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 1.5rem;
+const QuestionCard = styled.div`
+  border: 1px solid #e5e7eb;
+  padding: 1rem;
+  border-radius: 8px;
   margin-bottom: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  
-  &:hover {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-  }
 `;
 
-const QuestionText = styled.h3`
-  font-size: 1.2rem;
+const QuestionText = styled.div`
   font-weight: 600;
-  color: #333;
   margin-bottom: 1rem;
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
 `;
 
 const QuestionNumber = styled.span`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-  font-weight: 600;
+  color: #4f46e5;
 `;
 
 const OptionsList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 `;
 
 const OptionLabel = styled.label`
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  background: ${props => props.selected ? 'rgba(102, 126, 234, 0.1)' : 'transparent'};
-  border: 2px solid ${props => props.selected ? '#667eea' : '#e2e8f0'};
-  
-  &:hover {
-    background: rgba(102, 126, 234, 0.05);
-    border-color: #667eea;
-  }
+  background: ${(props) => (props.selected ? "#eef2ff" : "#fff")};
 `;
 
 const RadioInput = styled.input`
-  width: 18px;
-  height: 18px;
-  accent-color: #667eea;
+  accent-color: #6366f1;
 `;
 
 const OptionText = styled.span`
-  flex: 1;
+  flex-grow: 1;
 `;
 
 const SubmitButton = styled(motion.button)`
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.5rem;
-  margin: 2rem auto 0;
-  padding: 0.75rem 2rem;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
+  margin-top: 2rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-  
-  &:hover {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+  &:disabled {
+    background: #d1fae5;
+    cursor: not-allowed;
   }
 `;
 
-const LoadingMessage = styled.div`
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-`;
-
-const ErrorMessage = styled.div`
-  padding: 1rem;
-  border-radius: 12px;
-  background: rgba(239, 68, 68, 0.1);
-  color: #991b1b;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  justify-content: center;
-`;
-
-const formatTime = (secs) => {
-  const m = Math.floor(secs / 60)
-    .toString()
-    .padStart(2, '0');
-  const s = (secs % 60).toString().padStart(2, '0');
-  return `${m}:${s}`;
-};
-
+const languageOptions = [
+  { name: "C++", mode: "c_cpp", id: 54 },
+  { name: "Python", mode: "python", id: 71 },
+  { name: "JavaScript", mode: "javascript", id: 63 },
+];
 
 export default function TakeAssessment() {
   const [test, setTest] = useState(null);
   const [answers, setAnswers] = useState([]);
+  const [codingAnswers, setCodingAnswers] = useState({});
+  const [codeResult, setCodeResult] = useState({});
+  const [language, setLanguage] = useState(languageOptions[0]);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -211,10 +175,40 @@ export default function TakeAssessment() {
     setAnswers(newAnswers);
   };
 
+  const handleCodeChange = (questionId, code) => {
+    setCodingAnswers((prev) => ({ ...prev, [questionId]: code }));
+  };
+
+  const handleCodeSubmit = async (questionId) => {
+    const code = codingAnswers[questionId];
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/test/submit/code",
+        {
+          code,
+          language_id: language.id,
+          questionId,
+        },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      setCodeResult((prev) => ({ ...prev, [questionId]: res.data }));
+    } catch (err) {
+      setCodeResult((prev) => ({
+        ...prev,
+        [questionId]: {
+          status: "Error",
+          message: err.response?.data?.message || "Execution failed",
+        },
+      }));
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/assessment/submit",
+        "http://localhost:5000/api/test/submit/code",
         {
           testCode,
           userAnswers: answers,
@@ -233,11 +227,7 @@ export default function TakeAssessment() {
 
   return (
     <Container>
-      <AssessmentContainer
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
+      <AssessmentContainer>
         <Header>
           <Title>Assessment</Title>
         </Header>
@@ -259,36 +249,85 @@ export default function TakeAssessment() {
                 <strong>Test:</strong> {test.title}
               </InfoItem>
               <InfoItem>
-                <Clock size={18} />
-                Duration: {test.duration} minutes
+                <Clock size={18} /> Duration: {test.duration} minutes
+              </InfoItem>
+              <InfoItem>
+                Language:
+                <select
+                  value={language.id}
+                  onChange={(e) =>
+                    setLanguage(
+                      languageOptions.find(
+                        (l) => l.id === parseInt(e.target.value)
+                      )
+                    )
+                  }
+                >
+                  {languageOptions.map((lang) => (
+                    <option key={lang.id} value={lang.id}>
+                      {lang.name}
+                    </option>
+                  ))}
+                </select>
               </InfoItem>
             </TestInfo>
 
             {test.questions.map((q, i) => (
-              <QuestionCard
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-              >
+              <QuestionCard key={i}>
                 <QuestionText>
                   <QuestionNumber>{i + 1}</QuestionNumber>
                   {q.question}
                 </QuestionText>
-                <OptionsList>
-                  {q.options.map((opt, j) => (
-                    <OptionLabel key={j} selected={answers[i] === j}>
-                      <RadioInput
-                        type="radio"
-                        name={`q${i}`}
-                        checked={answers[i] === j}
-                        onChange={() => handleSelect(i, j)}
-                      />
-                      <OptionText>{opt}</OptionText>
-                      {answers[i] === j && <CheckCircle size={18} color="#667eea" />}
-                    </OptionLabel>
-                  ))}
-                </OptionsList>
+
+                {q.type === "mcq" ? (
+                  <OptionsList>
+                    {q.options.map((opt, j) => (
+                      <OptionLabel key={j} selected={answers[i] === j}>
+                        <RadioInput
+                          type="radio"
+                          name={`q${i}`}
+                          checked={answers[i] === j}
+                          onChange={() => handleSelect(i, j)}
+                        />
+                        <OptionText>{opt}</OptionText>
+                        {answers[i] === j && <CheckCircle size={18} color="#667eea" />}
+                      </OptionLabel>
+                    ))}
+                  </OptionsList>
+                ) : (
+                  <>
+                    <AceEditor
+                      mode={language.mode}
+                      theme="monokai"
+                      name={`code-editor-${i}`}
+                      fontSize={14}
+                      value={codingAnswers[q._id] || ""}
+                      onChange={(value) => handleCodeChange(q._id, value)}
+                      width="100%"
+                      height="300px"
+                      editorProps={{ $blockScrolling: true }}
+                      setOptions={{
+                        enableBasicAutocompletion: true,
+                        enableLiveAutocompletion: true,
+                        showLineNumbers: true,
+                        tabSize: 4,
+                      }}
+                    />
+                    <SubmitButton
+                      onClick={() => handleCodeSubmit(q._id)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      style={{ marginTop: "1rem" }}
+                    >
+                      Run Code
+                    </SubmitButton>
+                    {codeResult[q._id] && (
+                      <pre style={{ whiteSpace: "pre-wrap", marginTop: "0.5rem" }}>
+                        {JSON.stringify(codeResult[q._id], null, 2)}
+                      </pre>
+                    )}
+                  </>
+                )}
               </QuestionCard>
             ))}
 
@@ -296,10 +335,11 @@ export default function TakeAssessment() {
               onClick={handleSubmit}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              disabled={answers.some(a => a === null)}
+              disabled={answers.some((a, i) =>
+                test.questions[i].type === "mcq" && a === null
+              )}
             >
-              <Send size={20} />
-              Submit Assessment
+              <Send size={20} /> Submit Assessment
             </SubmitButton>
           </>
         )}
