@@ -28,7 +28,7 @@ const PastTest = () => {
     (async () => {
       try {
         const  data  = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/test/creator/${user.id}`,           // backend route
+          `${import.meta.env.VITE_BACKEND_URL}/api/test/creator/${user.id}`,           // backend route
           {
             headers: { Authorization: `Bearer ${token}` },
             cancelToken: source.token,

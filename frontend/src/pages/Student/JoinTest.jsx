@@ -129,7 +129,7 @@ export default function JoinTest() {
     e.preventDefault();
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/assessment/start`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/assessment/start`,
         { testCode },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );

@@ -157,7 +157,7 @@ export default function TakeAssessment() {
     }
 
     axios
-      .get(`${import.meta.env.VITE_API_URL}/api/test/join/${testCode}`, {
+      .get(`${import.meta.env.VITE_BACKEND_URL}/api/test/join/${testCode}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       })
       .then((res) => {
@@ -183,7 +183,7 @@ export default function TakeAssessment() {
     const code = codingAnswers[questionId];
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/test/submit/code`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/test/submit/code`,
         {
           code,
           language_id: language.id,
@@ -208,7 +208,7 @@ export default function TakeAssessment() {
   const handleSubmit = async () => {
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/test/submit/code`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/test/submit/code`,
         {
           testCode,
           userAnswers: answers,

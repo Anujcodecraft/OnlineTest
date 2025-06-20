@@ -29,7 +29,7 @@ const Report = () => {
   const fetchtest = async () => {
     try {
       const { data } = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/test/test/${testId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/test/test/${testId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
